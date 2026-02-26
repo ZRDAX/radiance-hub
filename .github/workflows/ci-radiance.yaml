@@ -1,0 +1,66 @@
+name: Radiance CI Pipeline
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # 1️⃣ Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ Setup Node
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      # 3️⃣ Install frontend deps
+      - name: Install frontend dependencies
+        run: yarn install --frozen-lockfile
+
+      # 4️⃣ Lint frontend
+      - name: Lint frontend
+        run: yarn lint
+
+      # 5️⃣ Build frontend
+      - name: Build frontend
+        run: yarn build
+
+      # 6️⃣ Setup Rust
+      - name: Setup Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      # 7️⃣ Cache Cargo
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src-tauri/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      # 8️⃣ Check formatting
+      - name: Check Rust formatting
+        working-directory: src-tauri
+        run: cargo fmt --check
+
+      # 9️⃣ Cargo check
+      - name: Cargo check
+        working-directory: src-tauri
+        run: cargo check
+
+      # 🔟 Run Rust tests
+      - name: Run Rust tests
+        working-directory: src-tauri
+        run: cargo test
