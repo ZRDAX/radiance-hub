@@ -1,121 +1,75 @@
-# Tauri: An Ultimate Project Template
+# Radiance Hub
 
-[![NPM Version](https://img.shields.io/npm/v/create-tauri-react)](https://www.npmjs.com/package/create-tauri-react)
-[![NPM Downloads](https://img.shields.io/npm/dm/create-tauri-react)](https://www.npmjs.com/package/create-tauri-react)
+Radiance Hub is a Windows-focused tray application for software updates.
 
-This template should help get you started developing with [Tauri](https://tauri.app), [React](https://reactjs.org), [Typescript](https://typescriptlang.org) and [Tailwind CSS](https://tailwindcss.com) (w/ [shadcn/ui](https://ui.shadcn.com/)) in [Vite](https://vitejs.dev).
+It runs with **Tauri + Rust** on the backend and **React + TypeScript** on the frontend, using `winget` as the current package manager source.
 
-The architecture is based on practices suggested by [@alan2207](https://github.com/alan2207) in his [bulletproof-react](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md).
+## Current Product Scope
 
-In addition, this template configures [ESLint](https://eslint.org/), [Prettier](https://prettier.io/), [Husky](https://typicode.github.io/husky/) and [Lint-staged](https://github.com/lint-staged/lint-staged) for pre-commits.
+- Tray popup experience (compact update panel)
+- Check pending updates
+- Run single update
+- Run batch update (`Update All`)
+- Keep app alive in background (close-to-tray behavior)
+- Open/focus/toggle from system tray
 
-![Demo Screenshot](./assets/demo.png)
+## Tech Stack
 
-## Getting Started
+### Frontend
+- React 19
+- TypeScript 5
+- Vite 7
+- Tailwind CSS 4
+- shadcn/ui (base UI components)
 
-### Basics
+### Desktop / Backend
+- Tauri v2
+- Rust 2021 edition
+- `tauri-plugin-shell`
+- `tauri-plugin-process`
+- `tauri-plugin-positioner` (tray window positioning)
+- `serde` / `serde_json`
 
-Ensure that you have the [Tauri prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites) installed.
+## Project Scripts
 
-#### Create a new project
+From project root:
 
 ```bash
-npx create-tauri-react@latest
+yarn dev         # frontend dev server
+yarn build       # typecheck + production frontend build
+yarn lint        # eslint
+yarn tauri dev   # run desktop app in development
+yarn tauri build # build desktop bundles
 ```
 
-## What's included
+Rust checks (inside `src-tauri`):
 
-### Core
-
-A basic Tauri setup with Vite, React, Typescript.
-
-#### Tailwind CSS
-
-A basic Tailwind CSS setup. Includes a `components.json` for Shadcn UI components.
-
-### Dev Tools
-
-#### Eslint 9
-
-A new Eslint 9 setup with flat config. This will help you to keep your code clean and consistent.
-
-#### Prettier
-
-A basic Prettier setup to keep your code formatted.
-
-#### Husky + Lint-staged
-
-Pre-commit hooks to run Eslint and Prettier on staged files.
-
-## How to use?
-
-Once again, the architecture of the template is based on practices proposed by [@alan2207](https://github.com/alan2207) in his [bulletproof-react](https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md).
-
-```
-src
-|
-+-- app               # application layer containing:
-|   |                 # this folder might differ based on the meta framework used
-|   +-- routes        # application routes / can also be pages
-|   +-- app.tsx       # main application component
-|   +-- provider.tsx  # application provider that wraps the entire application with different global providers - this might also differ based on meta framework used
-|   +-- router.tsx    # application router configuration
-+-- assets            # assets folder can contain all the static files such as images, fonts, etc.
-|
-+-- components        # shared components used across the entire application
-|
-+-- config            # global configurations, exported env variables etc.
-|
-+-- features          # feature based modules
-|
-+-- hooks             # shared hooks used across the entire application
-|
-+-- lib               # reusable libraries preconfigured for the application
-|
-+-- stores            # global state stores
-|
-+-- testing           # test utilities and mocks
-|
-+-- types             # shared types used across the application
-|
-+-- utils             # shared utility functions
+```bash
+cargo fmt --check
+cargo check
+cargo test
 ```
 
-```
-src/features/awesome-feature
-|
-+-- api         # exported API request declarations and api hooks related to a specific feature
-|
-+-- assets      # assets folder can contain all the static files for a specific feature
-|
-+-- components  # components scoped to a specific feature
-|
-+-- hooks       # hooks scoped to a specific feature
-|
-+-- stores      # state stores for a specific feature
-|
-+-- types       # typescript types used within the feature
-|
-+-- utils       # utility functions for a specific feature
-```
+## Requirements
 
-So, simply put:
+- Node.js 20+ recommended
+- Yarn 1.x
+- Rust toolchain (stable)
+- Tauri prerequisites for Windows
+- `winget` available in PATH
 
-- Define your app's routes in `src/app/router.tsx` and `src/app/routes/*` with minimal business logic.
-- The pages from the routes should be using `src/features` to build up functionality on the page.
-- The features should be using components from `src/components`, which are pure ui components (like [Shadcn UI](https://ui.shadcn.com/)) or layouts.
-- For an extended template, you can look up [`@MrLightful/powersync-tauri`](https://github.com/MrLightful/powersync-tauri), which also defines `src/config` and `src/hooks` examples.
+## Architecture Notes
 
-## Architecture
+- Backend (`src-tauri/src/winget.rs`) is the source of truth for update parsing/execution.
+- Frontend consumes structured JSON via Tauri `invoke`.
+- Updates state is centralized in `src/features/updates/hooks/use-updates.tsx`.
+- Tray behavior is implemented in `src-tauri/src/main.rs`.
 
-The project is feature-oriented and modular.
+## Useful Docs in This Repo
 
-Frontend:
-- React + TypeScript
-- Vite
-- Tailwind + shadcn/ui
+- `PROJECT_STRUCTURE.md`: current folder/module structure
+- `CI_STACK.md`: stack and CI guidance for workflow implementation
 
-Backend:
-- Tauri
-- Rust
-- Winget integration
+## Status
+
+The project is in active evolution toward a polished tray-native update manager workflow.
