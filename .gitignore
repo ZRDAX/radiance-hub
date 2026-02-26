@@ -15,3 +15,8 @@ src-tauri/target/
 # OS
 .DS_Store
 Thumbs.db
+
+# DOCS
+docs/
+CI_STACK.md
+PROJECT_STRUCTURE.md
